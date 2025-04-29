@@ -88,7 +88,7 @@ final class SseTransport implements TransportInterface
         $this->sendEvent(event: 'endpoint', data: StringUtil::makeEndpoint(sessionId: $this->clientId));
     }
 
-    /**
+       /**
      * Sends a formatted SSE event to the client and flushes output buffers.
      *
      * @param  string  $event  The event name.
@@ -96,29 +96,27 @@ final class SseTransport implements TransportInterface
      */
     private function sendEvent(string $event, string $data): void
     {
-        // 헤더 설정이 이미 전송되었는지 확인
         if (! headers_sent()) {
-            // 버퍼링 비활성화
             ini_set('output_buffering', 'off');
             ini_set('zlib.output_compression', false);
 
-            // 필수 SSE 헤더 추가
             header('Content-Type: text/event-stream');
             header('Cache-Control: no-cache');
             header('X-Accel-Buffering: no');
             header('Connection: keep-alive');
         }
-
-        // 모든 버퍼 비우기
-        while (ob_get_level() > 0) {
-            ob_end_flush();
+        
+        if (!extension_loaded('swoole')) {
+            // Limpa qualquer buffer de saída se não estiver usando Swoole
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
         }
 
-        echo sprintf('event: %s', $event).PHP_EOL;
-        echo sprintf('data: %s', $data).PHP_EOL;
-        echo PHP_EOL;
-
+        echo "event: {$event}\n";
+        echo "data: {$data}\n\n";
         flush();
+
     }
 
     /**
