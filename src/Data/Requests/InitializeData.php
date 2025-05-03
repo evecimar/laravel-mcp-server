@@ -17,7 +17,7 @@ class InitializeData
         $this->capabilities = $capabilities;
     }
 
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data = null): self
     {
         return new self(
             $data['version'] ?? '1.0',

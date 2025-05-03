@@ -10,6 +10,7 @@ use OPGG\LaravelMcpServer\Protocol\Handlers\NotificationHandler;
 use OPGG\LaravelMcpServer\Protocol\Handlers\RequestHandler;
 use OPGG\LaravelMcpServer\Protocol\MCPProtocol;
 use OPGG\LaravelMcpServer\Server\Request\InitializeHandler;
+use OPGG\LaravelMcpServer\Server\Request\InitializeNotificationHandler;
 use OPGG\LaravelMcpServer\Server\Request\ToolsCallHandler;
 use OPGG\LaravelMcpServer\Server\Request\ToolsListHandler;
 use OPGG\LaravelMcpServer\Services\ToolService\ToolRepository;
@@ -73,6 +74,7 @@ final class MCPServer
 
         // Register the handler for the mandatory 'initialize' method.
         $this->registerRequestHandler(new InitializeHandler($this));
+        $this->registerNotificationHandler(new InitializeNotificationHandler($this));
     }
 
     /**
@@ -160,11 +162,8 @@ final class MCPServer
      *
      * @throws JsonRpcErrorException If the server has already been initialized (JSON-RPC error code -32600).
      */
-    public function initialize(InitializeData $data): InitializeResource
+    public function initialize(InitializeData $data = null): InitializeResource
     {
-        if ($this->initialized) {
-            throw new JsonRpcErrorException(message: 'Server already initialized', code: JsonRpcErrorCode::INVALID_REQUEST);
-        }
 
         $this->initialized = true;
 
